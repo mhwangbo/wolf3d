@@ -65,17 +65,22 @@ void	wolf_ray_cast(t_env *e)
 	int		j;
 
 	i = -1;
+	int	wid;
+	int	hei;
+	int	*tex_1;
+	tex_1 = (int*)mlx_xpm_file_to_image(e->mlx_ptr, "./img/wall.xpm", &wid, &hei);
 	while (++i < e->block_h)
 	{
 		j = -1;
 		while (++j < e->block_w)
 		{
-			if (j % 16 == 0)
-				texture[(i * (int)e->block_w) + j] = 0x123123;
-			else if (i % 8 == 0)
-				texture[(i * (int)e->block_w) + j] = 0x123123;
-			else
-				texture[(i * (int)e->block_w) + j] = 0xFFFFFF - i * 100;
+			texture[(i * (int)e->block_w) + j] = tex_1[(i * (int)e->block_w) + j];
+//			if (j % 16 == 0)
+//				texture[(i * (int)e->block_w) + j] = 0x123123;
+//			else if (i % 8 == 0)
+//				texture[(i * (int)e->block_w) + j] = 0x123123;
+//			else
+//				texture[(i * (int)e->block_w) + j] = 0xFFFFFF - i * 100;
 		}
 	}
 	ft_bzero(e->data, e->win_x * e->win_y * 4);
@@ -111,10 +116,10 @@ void	wolf_ray_cast(t_env *e)
 			POS.d = y * 256 - e->win_y * 128 + POS.line_height * 128;
 			POS.tex_y = ((POS.d * e->block_h) / POS.line_height) / 256;
 			POS.color = texture[(int)(e->block_w * POS.tex_y + POS.tex_x)];
-			if (POS.side == 1)
-				POS.color /= 2;
-			if (POS.door == 1)
-				POS.color /= 3;
+//			if (POS.side == 1)
+//				POS.color /= 2;
+//			if (POS.door == 1)
+//				POS.color /= 3;
 			e->data[(y * (int)e->win_x) + x] = POS.color;
 		}
 		//floor
