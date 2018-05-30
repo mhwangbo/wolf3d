@@ -6,7 +6,7 @@
 /*   By: mhwangbo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/25 14:54:29 by mhwangbo          #+#    #+#             */
-/*   Updated: 2018/05/30 01:01:01 by mhwangbo         ###   ########.fr       */
+/*   Updated: 2018/05/30 01:12:48 by mhwangbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,75 +14,69 @@
 
 void	wolf_ray_cast(t_env *e)
 {
-	int		x = -1;
+	int		x;
 	int		y;
 
 	ft_bzero(e->data, e->win_x * e->win_y * 4);
+	x = -1;
 	while(++x < e->win_x)
 	{
-		double camera_x = 2 * x / e->win_x - 1;
-		double ray_dir_x = POS.dir_x + POS.plane_x * camera_x;
-		double ray_dir_y = POS.dir_y + POS.plane_y * camera_x;
+		POS.camera.x = 2 * x / e->win_x - 1;
+		POS.ray_dir_x = POS.dir_x + POS.plane_x * POS.camera.x;
+		POS.ray_dir_y = POS.dir_y + POS.plane_y * POS.camera.x;
 
-		int map_x = (int)POS.pos_x;
-		int	map_y = (int)POS.pos_y;
+		POS.map_x = (int)POS.pos_x;
+		POS.map_y = (int)POS.pos_y;
 
-		double	side_dist_x;
-		double	side_dist_y;
 
-		double	delta_dist_x = fabs(1 / ray_dir_x);
-		double	delta_dist_y = fabs(1 / ray_dir_y);
-		double	perp_wall_dist;
+		POS.delta_dist_x = fabs(1 / POS.ray_dir_x);
+		POS.delta_dist_y = fabs(1 / POS.ray_dir_y);
 
-		int	step_x;
-		int	step_y;
-
-		int	hit = 0;
-		int	side;
+		POS.hit = 0;
 		//step and initial side distance
-		if (ray_dir_x < 0)
+		if (POS.ray_dir_x < 0)
 		{
-			step_x = -1;
-			side_dist_x = (POS.pos_x - map_x) * delta_dist_x;
+			POS.step_x = -1;
+			POS.side_dist_x = (POS.pos_x - POS.map_x) * POS.delta_dist_x;
 		}
 		else
 		{
-			step_x = 1;
-			side_dist_x = (map_x + 1.0 - POS.pos_x) * delta_dist_x;
+			POS.step_x = 1;
+			POS.side_dist_x = (POS.map_x + 1.0 - POS.pos_x) * POS.delta_dist_x;
 		}
-		if (ray_dir_y < 0)
+		if (POS.ray_dir_y < 0)
 		{
-			step_y = -1;
-			side_dist_y = (POS.pos_y - map_y) * delta_dist_y;
+			POS.step_y = -1;
+			POS.side_dist_y = (POS.pos_y - POS.map_y) * POS.delta_dist_y;
 		}
 		else
 		{
-			step_y = 1;
-			side_dist_y = (map_y + 1.0 - POS.pos_y) * delta_dist_y;
+			POS.step_y = 1;
+			POS.side_dist_y = (POS.map_y + 1.0 - POS.pos_y) * POS.delta_dist_y;
 		}
 		//DDA
-		while (hit == 0)
+		while (POS.hit == 0)
 		{
-			if (side_dist_x < side_dist_y)
+			if (POS.side_dist_x < POS.side_dist_y)
 			{
-				side_dist_x += delta_dist_x;
-				map_x += step_x;
+				POS.side_dist_x += POS.delta_dist_x;
+				POS.map_x += POS.step_x;
 				side = 0;
 			}
 			else
 			{
-				side_dist_y += delta_dist_y;
-				map_y += step_y;
+				POS.side_dist_y += POS.delta_dist_y;
+				POS.map_y += POS.step_y;
 				side = 1;
 			}
-			if (e->map[map_y][map_x].wall_type > 0)
-				hit = 1;
+			if (e->map[POS.map_y][POS.map_x].wall_type > 0)
+				POS.hit = 1;
 		}
-		if (side == 0)
-			perp_wall_dist = (map_x - POS.pos_x + (1 - step_x) / 2) / ray_dir_x;
+		if (POS.side == 0)
+			POS.perp_wall_dist = (POS.map_x - POS.pos_x + (1 - POS.step_x) / 2) / POS.ray_dir_x;
 		else
-			perp_wall_dist = (map_y - POS.pos_y + (1 - step_y) / 2) / ray_dir_y;
-		int		line_height = (int)(e->win_y / perp_wall_dist);
+			POS.perp_wall_dist = (POS.map_y - POS.pos_y + (1 - POS.step_y) / 2) / POS.ray_dir_y;
+		int		line_height = (int)(e->win_y / POS.perp_wall_dist);
 		int		draw_start = -line_height / 2 + e->win_y / 2;
 		if (draw_start < 0)
 			draw_start = 0;
@@ -91,22 +85,22 @@ void	wolf_ray_cast(t_env *e)
 			draw_end = e->win_y - 1;
 
 		double	wall_x;
-		if (side == 0)
-			wall_x = POS.pos_y + perp_wall_dist * ray_dir_y;
+		if (POS.side == 0)
+			wall_x = POS.pos_y + POS.perp_wall_dist * POS.ray_dir_y;
 		else
-			wall_x = POS.pos_x + perp_wall_dist * ray_dir_x;
+			wall_x = POS.pos_x + POS.perp_wall_dist * POS.ray_dir_x;
 		wall_x -= floor(wall_x);
 
 		int		tex_x = (int)(wall_x * e->block_w);
-		if (side == 0 && ray_dir_x > 0)
+		if (POS.side == 0 && POS.ray_dir_x > 0)
 			tex_x = e->block_w - tex_x - 1;
-		if (side == 1 && ray_dir_x < 0)
+		if (POS.side == 1 && POS.ray_dir_x < 0)
 			tex_x = e->block_w - tex_x - 1;
 		y = draw_start - 1;
 		while (++y < draw_end)
 		{
 			int color = 0xFFFFFF;
-			if (side == 1)
+			if (POS.side == 1)
 				color = 0x800000;
 			e->data[(y * (int)e->win_x) + x] = color;
 		}
