@@ -6,7 +6,7 @@
 /*   By: mhwangbo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/25 14:57:35 by mhwangbo          #+#    #+#             */
-/*   Updated: 2018/05/27 21:46:05 by mhwangbo         ###   ########.fr       */
+/*   Updated: 2018/05/30 01:01:52 by mhwangbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,10 @@
 # include "../lib/Libft/libft.h"
 # include <math.h>
 # include <mlx.h>
+# include <pthread.h>
 # include <stdio.h>
 # define POS e->pos
+# define ROT 0.1
 
 typedef struct		s_vec
 {
@@ -30,38 +32,23 @@ typedef struct		s_pos
 {
 	double			pos_x;
 	double			pos_y;
+	double			plane_pos;
 	double			dir_x;
 	double			dir_y;
 	double			old_dir_x;
 	double			old_plane_x;
 	double			plane_x;
 	double			plane_y;
-	double			camera_x;
-	double			ray_dir_x;
-	double			ray_dir_y;
-	int				map_x;
-	int				map_y;
-	double			side_dist_x;
-	double			side_dist_y;
-	double			delta_dist_x;
-	double			delta_dist_y;
-	double			wall_dist;
-	int				step_x;
-	int				step_y;
-	int				hit;
-	int				side;
-	int				line_height;
-	int				draw_start;
-	int				draw_end;
 
-	double			floor_x;
-	double			floor_y;
 }					t_pos;
 
 typedef struct		s_env
 {
-	int				win_x;
-	int				win_y;
+	double			win_x;
+	double			win_y;
+	double			block_w;
+	double			block_h;
+	double			speed;
 
 	void			*mlx_ptr;
 	void			*win_ptr;
@@ -75,6 +62,8 @@ typedef struct		s_env
 	double			x_max;
 	t_vec			**map;
 	t_pos			pos;
+	int				min;
+	int				max;
 }					t_env;
 
 #endif

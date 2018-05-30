@@ -6,7 +6,7 @@
 /*   By: mhwangbo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/25 14:54:29 by mhwangbo          #+#    #+#             */
-/*   Updated: 2018/05/27 21:46:09 by mhwangbo         ###   ########.fr       */
+/*   Updated: 2018/05/30 01:01:01 by mhwangbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,104 +14,141 @@
 
 void	wolf_ray_cast(t_env *e)
 {
-	int		x;
+	int		x = -1;
+	int		y;
 
-	x = -1;
 	ft_bzero(e->data, e->win_x * e->win_y * 4);
-	while (++x < e->win_x)
+	while(++x < e->win_x)
 	{
-		POS.hit = 0;
-		POS.camera_x = 2 * x / (double)e->win_x - 1;
-		POS.ray_dir_x = POS.dir_x + POS.plane_x * POS.camera_x;
-		POS.ray_dir_y = POS.dir_y + POS.plane_y * POS.camera_x;
-		POS.map_x = (int)POS.pos_x;
-		POS.map_y = (int)POS.pos_y;
-		POS.delta_dist_x = fabs(1 / POS.ray_dir_x);
-		POS.delta_dist_y = fabs(1 / POS.ray_dir_y);
-		POS.step_x = (POS.ray_dir_x < 0 ? -1 : 1); 
-		POS.side_dist_x = (POS.ray_dir_x < 0 ?
-				(POS.pos_x - POS.map_x) :
-				(POS.map_x + 1 - POS.pos_x)) * POS.delta_dist_x; 
-		POS.step_y = (POS.ray_dir_y < 0 ? -1 : 1); 
-		POS.side_dist_y = (POS.ray_dir_y < 0 ?
-				(POS.pos_y - POS.map_y) :
-				(POS.map_y + 1 - POS.pos_y)) * POS.delta_dist_y;
-		while (POS.hit == 0)
+		double camera_x = 2 * x / e->win_x - 1;
+		double ray_dir_x = POS.dir_x + POS.plane_x * camera_x;
+		double ray_dir_y = POS.dir_y + POS.plane_y * camera_x;
+
+		int map_x = (int)POS.pos_x;
+		int	map_y = (int)POS.pos_y;
+
+		double	side_dist_x;
+		double	side_dist_y;
+
+		double	delta_dist_x = fabs(1 / ray_dir_x);
+		double	delta_dist_y = fabs(1 / ray_dir_y);
+		double	perp_wall_dist;
+
+		int	step_x;
+		int	step_y;
+
+		int	hit = 0;
+		int	side;
+		//step and initial side distance
+		if (ray_dir_x < 0)
 		{
-			if (POS.side_dist_x < POS.side_dist_y)
+			step_x = -1;
+			side_dist_x = (POS.pos_x - map_x) * delta_dist_x;
+		}
+		else
+		{
+			step_x = 1;
+			side_dist_x = (map_x + 1.0 - POS.pos_x) * delta_dist_x;
+		}
+		if (ray_dir_y < 0)
+		{
+			step_y = -1;
+			side_dist_y = (POS.pos_y - map_y) * delta_dist_y;
+		}
+		else
+		{
+			step_y = 1;
+			side_dist_y = (map_y + 1.0 - POS.pos_y) * delta_dist_y;
+		}
+		//DDA
+		while (hit == 0)
+		{
+			if (side_dist_x < side_dist_y)
 			{
-				POS.side_dist_x += POS.side_dist_x;
-				POS.map_x += POS.step_x;
-				POS.side = 0;
+				side_dist_x += delta_dist_x;
+				map_x += step_x;
+				side = 0;
 			}
 			else
 			{
-				POS.side_dist_y += POS.delta_dist_y;
-				POS.map_y += POS.step_y;
-				POS.side = 1;
+				side_dist_y += delta_dist_y;
+				map_y += step_y;
+				side = 1;
 			}
-			if (e->map[POS.map_y][POS.map_x].wall_type > 0)
-				POS.hit = 1;
+			if (e->map[map_y][map_x].wall_type > 0)
+				hit = 1;
 		}
-		if (POS.side == 0)
-			POS.wall_dist = (POS.map_x - POS.pos_x + (1 - POS.step_x) /2) / POS.ray_dir_x;
+		if (side == 0)
+			perp_wall_dist = (map_x - POS.pos_x + (1 - step_x) / 2) / ray_dir_x;
 		else
-			POS.wall_dist = (POS.map_y - POS.pos_y + (1 - POS.step_y) /2) / POS.ray_dir_y;
-		POS.line_height = (int)(e->win_y / POS.wall_dist);
-		POS.draw_start = -POS.line_height / 2 + e->win_y / 2;
-		if (POS.draw_start < 0)
-			POS.draw_start = 0;
-		POS.draw_end = POS.line_height / 2 + e->win_y / 2;
-		if (POS.draw_end >= e->win_y)
-			POS.draw_end = e->win_y - 1;
-		while (POS.draw_start <= POS.draw_end)
+			perp_wall_dist = (map_y - POS.pos_y + (1 - step_y) / 2) / ray_dir_y;
+		int		line_height = (int)(e->win_y / perp_wall_dist);
+		int		draw_start = -line_height / 2 + e->win_y / 2;
+		if (draw_start < 0)
+			draw_start = 0;
+		int		draw_end = line_height / 2 + e->win_y / 2;
+		if (draw_end >= e->win_y)
+			draw_end = e->win_y - 1;
+
+		double	wall_x;
+		if (side == 0)
+			wall_x = POS.pos_y + perp_wall_dist * ray_dir_y;
+		else
+			wall_x = POS.pos_x + perp_wall_dist * ray_dir_x;
+		wall_x -= floor(wall_x);
+
+		int		tex_x = (int)(wall_x * e->block_w);
+		if (side == 0 && ray_dir_x > 0)
+			tex_x = e->block_w - tex_x - 1;
+		if (side == 1 && ray_dir_x < 0)
+			tex_x = e->block_w - tex_x - 1;
+		y = draw_start - 1;
+		while (++y < draw_end)
 		{
-			e->data[(POS.draw_start * e->win_x) + x] =
-				(POS.side == 1 ? 0xFFFFFF / 2 : 0xFFFFFF);
-			POS.draw_start++;
+			int color = 0xFFFFFF;
+			if (side == 1)
+				color = 0x800000;
+			e->data[(y * (int)e->win_x) + x] = color;
 		}
 	}
-	//end of drawing wall
-	
+	mlx_put_image_to_window(e->mlx_ptr, e->win_ptr, e->img_ptr, 0, 0);
 }
 
 int		wolf_key(int key, t_env *e)
 {
-	key == 53 ? exit(0) : 0;
 	if (key == 126)
 	{
-		if (e->map[(int)POS.pos_y][(int)(POS.pos_x + POS.dir_x)].wall_type == 0)
-			POS.pos_x += POS.dir_x * 0.5;
-		if (e->map[(int)(POS.pos_y + POS.dir_y)][(int)POS.pos_x].wall_type == 0)
-			POS.pos_y += POS.dir_y * 0.5;
+		if (e->map[(int)(POS.pos_y)][(int)(POS.pos_x + POS.dir_x * e->speed)].wall_type == 0)
+			POS.pos_x += POS.dir_x * e->speed;
+		if (e->map[(int)(POS.pos_y + POS.dir_y * e->speed)][(int)(POS.pos_x)].wall_type == 0)
+		   POS.pos_y += POS.dir_y * e->speed;
 	}
 	if (key == 125)
 	{
-		if (e->map[(int)POS.pos_y][(int)(POS.pos_x + POS.dir_x)].wall_type == 0)
-			POS.pos_x -= POS.dir_x * 0.5;
-		if (e->map[(int)(POS.pos_y + POS.dir_y)][(int)POS.pos_x].wall_type == 0)
-			POS.pos_y -= POS.dir_y * 0.5;
+		if (e->map[(int)(POS.pos_y)][(int)(POS.pos_x - POS.dir_x * e->speed)].wall_type == 0)
+			POS.pos_x -= POS.dir_x * e->speed;
+		if (e->map[(int)(POS.pos_y - POS.dir_y * e->speed)][(int)(POS.pos_x)].wall_type == 0)
+		   POS.pos_y -= POS.dir_y * e->speed;
 	}
 	if (key == 124)
 	{
 		POS.old_dir_x = POS.dir_x;
-		POS.dir_x = POS.dir_x * cos(-1) - POS.dir_y * sin(-1);
-		POS.dir_y = POS.old_dir_x * sin(-1) + POS.dir_y * cos(-1);
+		POS.dir_x = POS.dir_x * cos(-ROT) - POS.dir_y * sin(-ROT);
+		POS.dir_y = POS.old_dir_x * sin(-ROT) + POS.dir_y * cos(-ROT);
 		POS.old_plane_x = POS.plane_x;
-		POS.plane_x = POS.plane_x * cos(-1) - POS.plane_y * sin(-1);
-		POS.plane_y = POS.old_plane_x * sin(-1) + POS.plane_y * cos(-1);
+		POS.plane_x = POS.plane_x * cos(-ROT) - POS.plane_y * sin(-ROT);
+		POS.plane_y = POS.old_plane_x * sin(-ROT) + POS.plane_y * cos(-ROT);
 	}
 	if (key == 123)
 	{
 		POS.old_dir_x = POS.dir_x;
-		POS.dir_x = POS.dir_x * cos(1) - POS.dir_y * sin(1);
-		POS.dir_y = POS.old_dir_x * sin(1) + POS.dir_y * cos(1);
+		POS.dir_x = POS.dir_x * cos(ROT) - POS.dir_y * sin(ROT);
+		POS.dir_y = POS.old_dir_x * sin(ROT) + POS.dir_y * cos(ROT);
 		POS.old_plane_x = POS.plane_x;
-		POS.plane_x = POS.plane_x * cos(1) - POS.plane_y * sin(1);
-		POS.plane_y = POS.old_plane_x * sin(1) + POS.plane_y * cos(1);
+		POS.plane_x = POS.plane_x * cos(ROT) - POS.plane_y * sin(ROT);
+		POS.plane_y = POS.old_plane_x * sin(ROT) + POS.plane_y * cos(ROT);
 	}
 	wolf_ray_cast(e);
-	mlx_put_image_to_window(e->mlx_ptr, e->win_ptr, e->img_ptr, 0, 0);
 	return (0);
 }
 
@@ -231,14 +268,17 @@ int		main(int ac, char **av)
 	e.map = (t_vec**)malloc(sizeof(t_vec*) * (e.y_max) + 1);
 	ft_bzero(&e.pos, sizeof(t_pos));
 	wolf_put_struct(file, &e);
-	e.win_x = 500;
-	e.win_y = 500;
+	e.win_x = 640;
+	e.win_y = 480;
+	e.block_w = 64;
+	e.block_h = 64;
 	e.pos.pos_x = 22;
-	e.pos.pos_y = 12;
-	e.pos.dir_x = -1;
-	e.pos.dir_y = 0;
-	e.pos.plane_x = 0;
+	e.pos.pos_y = 11.5;
+	e.pos.dir_x = -1.0;
+	e.pos.dir_y = 0.0;
+	e.pos.plane_x = 0.0;
 	e.pos.plane_y = 0.66;
+	e.speed = 0.1;
 	wolf_win(&e);
 	return (0);
 }
