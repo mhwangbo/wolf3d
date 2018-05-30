@@ -69,6 +69,7 @@ typedef struct		s_pos
 	double			weight;
 	double			current_floor_x;
 	double			current_floor_y;
+	int				door;
 }					t_pos;
 
 typedef struct		s_env

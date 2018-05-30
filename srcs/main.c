@@ -22,6 +22,7 @@ void	wolf_ray_cast_calc(t_env *e, int x)
 	POS.delta_dist_x = fabs(1 / POS.ray_dir_x);
 	POS.delta_dist_y = fabs(1 / POS.ray_dir_y);
 	POS.hit = 0;
+	POS.door = 0;
 	POS.step_x = (POS.ray_dir_x < 0 ? -1 : 1);
 	POS.side_dist_x = (POS.ray_dir_x < 0 ?
 		(POS.pos_x - POS.map_x) : (POS.map_x + 1.0 - POS.pos_x)) * POS.delta_dist_x;
@@ -47,7 +48,11 @@ void	wolf_ray_cast_dda(t_env *e)
 			POS.side= 1;
 		}
 		if (e->map[POS.map_y][POS.map_x].wall_type > 0)
+		{
+			if (e->map[POS.map_y][POS.map_x].wall_type == 6)
+				POS.door = 1;
 			POS.hit = 1;
+		}
 	}
 }
 
@@ -108,6 +113,8 @@ void	wolf_ray_cast(t_env *e)
 			POS.color = texture[(int)(e->block_w * POS.tex_y + POS.tex_x)];
 			if (POS.side == 1)
 				POS.color /= 2;
+			if (POS.door == 1)
+				POS.color /= 3;
 			e->data[(y * (int)e->win_x) + x] = POS.color;
 		}
 		//floor
@@ -182,6 +189,13 @@ int		wolf_key(int key, t_env *e)
 		POS.old_plane_x = POS.plane_x;
 		POS.plane_x = POS.plane_x * cos(ROT) - POS.plane_y * sin(ROT);
 		POS.plane_y = POS.old_plane_x * sin(ROT) + POS.plane_y * cos(ROT);
+	}
+	if (key == 49)
+	{
+		(e->map[(int)POS.pos_y + 1][(int)POS.pos_x].wall_type == 6) ? e->map[(int)POS.pos_y + 1][(int)POS.pos_x].wall_type = 0 : 0;
+		(e->map[(int)POS.pos_y - 1][(int)POS.pos_x].wall_type == 6) ? e->map[(int)POS.pos_y - 1][(int)POS.pos_x].wall_type = 0 : 0;
+		(e->map[(int)POS.pos_y][(int)POS.pos_x + 1].wall_type == 6) ? e->map[(int)POS.pos_y][(int)POS.pos_x + 1].wall_type = 0 : 0;
+		(e->map[(int)POS.pos_y][(int)POS.pos_x - 1].wall_type == 6) ? e->map[(int)POS.pos_y][(int)POS.pos_x - 1].wall_type = 0 : 0;
 	}
 	wolf_ray_cast(e);
 	return (0);
