@@ -56,6 +56,17 @@ typedef struct		s_pos
 	int				line_height;
 	int				draw_start;
 	int				draw_end;
+	double			wall_x;
+	int				tex_x;
+	int				color;
+	double			floor_x_wall;
+	double			floor_y_wall;
+	double			dist_wall;
+	double			dist_player;
+	double			current_dist;
+	double			weight;
+	double			current_floor_x;
+	double			current_floor_y;
 }					t_pos;
 
 typedef struct		s_env
