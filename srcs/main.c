@@ -55,7 +55,24 @@ void	wolf_ray_cast(t_env *e)
 {
 	int		x;
 	int		y;
+	int		texture[(int)(e->block_w * e->block_h)];
+	int		i;
+	int		j;
 
+	i = -1;
+	while (++i < e->block_h)
+	{
+		j = -1;
+		while (++j < e->block_w)
+		{
+			if (j % 16 == 0)
+				texture[(i * (int)e->block_w) + j] = 0x123123;
+			else if (i % 8 == 0)
+				texture[(i * (int)e->block_w) + j] = 0x123123;
+			else
+				texture[(i * (int)e->block_w) + j] = 0xFFFFFF - i * 100;
+		}
+	}
 	ft_bzero(e->data, e->win_x * e->win_y * 4);
 	x = -1;
 	while(++x < e->win_x)
@@ -78,7 +95,6 @@ void	wolf_ray_cast(t_env *e)
 		else
 			POS.wall_x = POS.pos_x + POS.perp_wall_dist * POS.ray_dir_x;
 		POS.wall_x -= floor(POS.wall_x);
-
 		POS.tex_x = (int)(POS.wall_x * e->block_w);
 		if (POS.side == 0 && POS.ray_dir_x > 0)
 			POS.tex_x = e->block_w - POS.tex_x - 1;
@@ -87,9 +103,11 @@ void	wolf_ray_cast(t_env *e)
 		y = POS.draw_start - 1;
 		while (++y < POS.draw_end)
 		{
-			POS.color = 0xFFFFFF;
+			POS.d = y * 256 - e->win_y * 128 + POS.line_height * 128;
+			POS.tex_y = ((POS.d * e->block_h) / POS.line_height) / 256;
+			POS.color = texture[(int)(e->block_w * POS.tex_y + POS.tex_x)];
 			if (POS.side == 1)
-				POS.color = 0x800000;
+				POS.color /= 2;
 			e->data[(y * (int)e->win_x) + x] = POS.color;
 		}
 		//floor

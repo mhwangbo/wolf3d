@@ -58,6 +58,8 @@ typedef struct		s_pos
 	int				draw_end;
 	double			wall_x;
 	int				tex_x;
+	int				d;
+	int				tex_y;
 	int				color;
 	double			floor_x_wall;
 	double			floor_y_wall;
