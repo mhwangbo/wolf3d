@@ -6,7 +6,7 @@
 /*   By: mhwangbo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/25 14:57:35 by mhwangbo          #+#    #+#             */
-/*   Updated: 2018/05/30 01:12:39 by mhwangbo         ###   ########.fr       */
+/*   Updated: 2018/05/30 18:03:25 by mhwangbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,8 @@ typedef struct		s_pos
 	double			current_floor_x;
 	double			current_floor_y;
 	int				door;
+	int				floor_tex_x;
+	int				floor_tex_y;
 }					t_pos;
 
 typedef struct		s_env

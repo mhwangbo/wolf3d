@@ -6,7 +6,7 @@
 /*   By: mhwangbo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/25 14:54:29 by mhwangbo          #+#    #+#             */
-/*   Updated: 2018/05/30 01:12:48 by mhwangbo         ###   ########.fr       */
+/*   Updated: 2018/05/30 18:03:23 by mhwangbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,27 +60,38 @@ void	wolf_ray_cast(t_env *e)
 {
 	int		x;
 	int		y;
-	int		texture[(int)(e->block_w * e->block_h)];
+	int		texture[3][(int)(e->block_w * e->block_h)];
 	int		i;
 	int		j;
 
 	i = -1;
-	int	wid;
-	int	hei;
-	int	*tex_1;
-	tex_1 = (int*)mlx_xpm_file_to_image(e->mlx_ptr, "./img/wall.xpm", &wid, &hei);
 	while (++i < e->block_h)
 	{
 		j = -1;
 		while (++j < e->block_w)
 		{
-			texture[(i * (int)e->block_w) + j] = tex_1[(i * (int)e->block_w) + j];
-//			if (j % 16 == 0)
-//				texture[(i * (int)e->block_w) + j] = 0x123123;
-//			else if (i % 8 == 0)
-//				texture[(i * (int)e->block_w) + j] = 0x123123;
-//			else
-//				texture[(i * (int)e->block_w) + j] = 0xFFFFFF - i * 100;
+			if (j % 16 == 0)
+				texture[0][(i * (int)e->block_w) + j] = 0x123123;
+			else if (i % 8 == 0)
+				texture[0][(i * (int)e->block_w) + j] = 0x123123;
+			else
+				texture[0][(i * (int)e->block_w) + j] = 0xFFFFFF - i * 100;
+		}
+		j = -1;
+		while (++j < e->block_w)
+		{
+			if (j % 32 == 0 || i % 32 == 0)
+				texture[1][(i * (int)e->block_w) + j] = 0x000000;
+			else
+				texture[1][(i * (int)e->block_w) + j] = 0xFFFFFF;
+		}
+		j = -1;
+		while (++j < e->block_w)
+		{
+			if (j % 3 == 0 || i % 5 == 0)
+				texture[2][(i * (int)e->block_w) + j] = 0x000000;
+			else
+				texture[2][(i * (int)e->block_w) + j] = 0x800000;
 		}
 	}
 	ft_bzero(e->data, e->win_x * e->win_y * 4);
@@ -115,11 +126,11 @@ void	wolf_ray_cast(t_env *e)
 		{
 			POS.d = y * 256 - e->win_y * 128 + POS.line_height * 128;
 			POS.tex_y = ((POS.d * e->block_h) / POS.line_height) / 256;
-			POS.color = texture[(int)(e->block_w * POS.tex_y + POS.tex_x)];
-//			if (POS.side == 1)
-//				POS.color /= 2;
-//			if (POS.door == 1)
-//				POS.color /= 3;
+			POS.color = texture[0][(int)(e->block_w * POS.tex_y + POS.tex_x)];
+			if (POS.side == 1)
+				POS.color /= 2;
+			if (POS.door == 1)
+				POS.color /= 3;
 			e->data[(y * (int)e->win_x) + x] = POS.color;
 		}
 		//floor
@@ -154,8 +165,10 @@ void	wolf_ray_cast(t_env *e)
 			POS.weight = (POS.current_dist - POS.dist_player) / (POS.dist_wall - POS.dist_player);
 			POS.current_floor_x = POS.weight * POS.floor_x_wall + (1.0 - POS.weight) * POS.pos_x;
 			POS.current_floor_y = POS.weight * POS.floor_y_wall + (1.0 - POS.weight) * POS.pos_y;
-			e->data[(y * (int)e->win_x) + x] = 0x432333;
-			e->data[(int)((e->win_y - y) * e->win_x) + x] = 0x322111;
+			POS.floor_tex_x = (int)(POS.current_floor_x * e->block_w) % (int)e->block_w;
+			POS.floor_tex_y = (int)(POS.current_floor_y * e->block_h) % (int)e->block_h;
+			e->data[y * (int)e->win_x + x] = texture[1][(int)(e->block_w * POS.floor_tex_y + POS.floor_tex_x)];
+			e->data[(int)((e->win_y - y) * e->win_x) + x] = texture[2][(int)(e->block_w * POS.floor_tex_y + POS.floor_tex_x)];
 		}
 	}
 	mlx_put_image_to_window(e->mlx_ptr, e->win_ptr, e->img_ptr, 0, 0);
