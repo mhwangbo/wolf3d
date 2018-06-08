@@ -6,7 +6,7 @@
 /*   By: mhwangbo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/25 14:57:35 by mhwangbo          #+#    #+#             */
-/*   Updated: 2018/05/30 18:03:25 by mhwangbo         ###   ########.fr       */
+/*   Updated: 2018/06/07 13:06:31 by mhwangbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,20 @@
 # include <mlx.h>
 # include <pthread.h>
 # include <stdio.h>
+# include <stddef.h>
 # define POS e->pos
 # define ROT 0.1
+
+typedef struct		s_tex
+{
+	void		*img;
+	int			*data;
+	int			bpp;
+	int			sizeline;
+	int			endian;
+	int			width;
+	int			height;
+}				t_tex;
 
 typedef struct		s_vec
 {
@@ -27,6 +39,12 @@ typedef struct		s_vec
 	int				wall_type;
 	int				color;
 }					t_vec;
+
+typedef struct		s_win
+{
+	int				intro;
+	int				texture_switch;
+}					t_win;
 
 typedef struct		s_pos
 {
@@ -81,21 +99,49 @@ typedef struct		s_env
 	double			block_w;
 	double			block_h;
 	double			speed;
-
+	int				run;
+	int				hand;
+	int				fire;
+	int				ammo;
 	void			*mlx_ptr;
 	void			*win_ptr;
 	void			*img_ptr;
+	int				step;
+	int				tex_change;
 	int				bpp;
 	int				size_line;
 	int				endian;
 	int				*data;
-
 	double			y_max;
 	double			x_max;
 	t_vec			**map;
 	t_pos			pos;
 	int				min;
 	int				max;
+	int				**texture;
+	t_tex			tex[7];
+	t_win			val;
 }					t_env;
+
+int					main(int ac, char **av);
+void				wolf_put_struct(int **file, t_env *e);
+int					**wolf_read(char *av, t_env *e);
+int					*wolf_split(char *line, t_env *e);
+void				wolf_find_max(char *av, t_env *e);
+void				wolf_win(t_env *e);
+void				wolf_ray_cast_dda(t_env *e);
+void				wolf_ray_cast_calc(t_env *e, int x);
+void				wolf_ray_cast(t_env *e);
+void				wall_texture(t_env *e, int i, int j);
+void				position(t_env *e);
+void				pos_wall(t_env *e, int x, int y);
+void				pos_floor(t_env *e);
+void				pos_floor2(t_env *e, int x, int y);
+int					wolf_key(int key, t_env *e);
+void				wolf_key2(int key, t_env *e);
+void				load_texture(t_env *e);
+void				intro_image(t_env *e);
+int					wolf_exit(t_env *e);
+void				wolf_win_start(t_env *e);
 
 #endif
