@@ -6,7 +6,7 @@
 /*   By: mhwangbo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/25 14:57:35 by mhwangbo          #+#    #+#             */
-/*   Updated: 2018/06/07 13:06:31 by mhwangbo         ###   ########.fr       */
+/*   Updated: 2018/06/09 21:06:06 by jukim            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,14 @@
 
 typedef struct		s_tex
 {
-	void		*img;
-	int			*data;
-	int			bpp;
-	int			sizeline;
-	int			endian;
-	int			width;
-	int			height;
-}				t_tex;
+	void			*img;
+	int				*data;
+	int				bpp;
+	int				sizeline;
+	int				endian;
+	int				width;
+	int				height;
+}					t_tex;
 
 typedef struct		s_vec
 {
@@ -119,29 +119,91 @@ typedef struct		s_env
 	int				min;
 	int				max;
 	int				**texture;
-	t_tex			tex[7];
+	t_tex			tex[10];
 	t_win			val;
+	int				shot;
+	int				b;
+	int				i;
+	int				l;
+	int				ang;
+	int				caption;
 }					t_env;
 
-int					main(int ac, char **av);
-void				wolf_put_struct(int **file, t_env *e);
-int					**wolf_read(char *av, t_env *e);
-int					*wolf_split(char *line, t_env *e);
-void				wolf_find_max(char *av, t_env *e);
-void				wolf_win(t_env *e);
-void				wolf_ray_cast_dda(t_env *e);
-void				wolf_ray_cast_calc(t_env *e, int x);
+/*
+** util.c
+*/
+
+int					animate(t_env *e);
+int					wolf_exit(t_env *e);
+void				billy_off(t_env *e);
+void				message(void);
+
+/*
+** texture.c
+*/
+
+void				malloc_texture(t_env *e);
+void				tex_into_texture(t_env *e, int i, int j);
+void				tex_into_texture2(t_env *e, int i, int j);
+void				load_texture(t_env *e);
+void				load_texture2(t_env *e);
+
+/*
+** raycasting.c
+*/
+
+void				xpm_to_texture(t_env *e, int i, int j);
 void				wolf_ray_cast(t_env *e);
 void				wall_texture(t_env *e, int i, int j);
+void				wolf_ray_cast_calc(t_env *e, int x);
+void				wolf_ray_cast_dda(t_env *e);
+
+/*
+** positioning.c
+*/
+
+void				crack(t_env *e);
+void				pos_hand(t_env *t, int i, int y);
+void				pos_ammo(t_env *t);
 void				position(t_env *e);
-void				pos_wall(t_env *e, int x, int y);
-void				pos_floor(t_env *e);
-void				pos_floor2(t_env *e, int x, int y);
+void				position2(t_env *e);
+
+/*
+** main.c
+*/
+
+void				intro_image(t_env *e);
+void				wolf_win(t_env *e);
+void				init_value(t_env *e);
+int					main(int ac, char **av);
+
+/*
+** key.c
+*/
+
 int					wolf_key(int key, t_env *e);
 void				wolf_key2(int key, t_env *e);
-void				load_texture(t_env *e);
-void				intro_image(t_env *e);
-int					wolf_exit(t_env *e);
+void				wolf_key3(int key, t_env *e);
+void				wolf_key4(int key, t_env *e);
+void				wolf_key5(int key, t_env *e);
+
+/*
+** init.c
+*/
+
 void				wolf_win_start(t_env *e);
+void				wolf_find_max(char *av, t_env *e);
+int					*wolf_split(char *line, t_env *e);
+int					**wolf_read(char *av, t_env *e);
+void				wolf_put_struct(int **file, t_env *e);
+
+/*
+** draw.c
+*/
+
+void				pos_wall(t_env *e, int x, int y);
+void				pos_wall2(t_env *e, int x, int y);
+void				pos_floor(t_env *e);
+void				pos_floor2(t_env *e, int x, int y);
 
 #endif

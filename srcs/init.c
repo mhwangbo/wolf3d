@@ -6,7 +6,7 @@
 /*   By: jukim <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/30 23:16:24 by jukim             #+#    #+#             */
-/*   Updated: 2018/06/07 12:34:52 by mhwangbo         ###   ########.fr       */
+/*   Updated: 2018/06/09 20:25:02 by jukim            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,22 +15,15 @@
 void	wolf_win_start(t_env *e)
 {
 	ft_bzero(e->data, e->win_x * e->win_y * 4);
+	if (e->ang == 1)
+	{
+		system("pkill -9 afplay");
+		system("afplay ./sound/heman.mp3 &");
+	}
 	(e->val.intro != 1) ? intro_image(e) : wolf_ray_cast(e);
-	mlx_loop(e->mlx_ptr);
-}
-
-void	wolf_win(t_env *e)
-{
-	e->mlx_ptr = mlx_init();
-	e->win_ptr = mlx_new_window(e->mlx_ptr, e->win_x, e->win_y, "wolf3d");
-	system("afplay ./sound/Map.wav &");
 	mlx_hook(e->win_ptr, 2, 2, wolf_key, e);
 	mlx_hook(e->win_ptr, 17, 0, wolf_exit, e);
-	load_texture(e);
-	e->img_ptr = mlx_new_image(e->mlx_ptr, e->win_x, e->win_y);
-	e->data = (int*)mlx_get_data_addr(e->img_ptr, &e->bpp, &e->size_line,
-			&e->endian);
-	wolf_win_start(e);
+	mlx_loop(e->mlx_ptr);
 }
 
 void	wolf_find_max(char *av, t_env *e)

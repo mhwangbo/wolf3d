@@ -6,13 +6,15 @@
 #    By: mhwangbo <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/05/09 17:05:50 by mhwangbo          #+#    #+#              #
-#    Updated: 2018/06/05 22:05:34 by mhwangbo         ###   ########.fr        #
+#    Updated: 2018/06/09 21:18:09 by jukim            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+.SILENT:
+
 NAME = wolf3d
 
-SRC =	main.c init.c positioning.c raycasting.c key.c
+SRC =	main.c init.c positioning.c raycasting.c key.c util.c texture.c draw.c
 
 OBJ = $(SRC:.c=.o)
 MLX = -L $(MLXDIR) -lmlx -framework OpenGL -framework Appkit
@@ -43,6 +45,7 @@ $(NAME): $(OBJS)
 	@make -C $(MLXDIR)
 	@make -C $(LIBDIR)
 	@$(CC) $(OBJS) $(LIBS) -o $@
+	@echo "\033[0;31m\033[1m\(>ㅠ<)/"
 
 clean:
 	@/bin/rm -rf $(OBJDIR)
