@@ -6,11 +6,23 @@
 /*   By: jukim <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/09 20:29:54 by jukim             #+#    #+#             */
-/*   Updated: 2018/06/09 21:23:42 by jukim            ###   ########.fr       */
+/*   Updated: 2018/06/17 20:31:06 by jukim            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf3d.h"
+
+void	file_check(char *av)
+{
+	int		fd;
+	int		ret;
+	char	str[BUF + 1];
+
+	(fd = open(av, O_RDONLY)) < 0 ? error_exit(1, fd) : 0;
+	ret = read(fd, str, BUF);
+	*str == 0 ? error_exit(1, fd) : 0;
+	close(fd);
+}
 
 int		animate(t_env *e)
 {
@@ -49,9 +61,10 @@ void	message(void)
 	ft_putendl("\n\n\t\tWOLF3D\n\nKEYS:");
 	ft_putendl("\t[W,S]/[Arrow Key - Up,Down] - Move Forward/Backward");
 	ft_putendl("\t[A,D]/[Arrow Key - Left,Right] - Rotate Left/Right");
-	ft_putendl("\t[Shift] - Run/Walk\n\t[ESC] - Exit");
-	ft_putendl("\t[Space] - Open Hidden Door");
-	ft_putendl("\n\t\t-SECRET MODE-\n");
+	ft_putendl("\t[SHIFT] - Run/Walk\n\t[ESC] - Exit");
+	ft_putendl("\t[SPACE] - Open Hidden Door");
+	ft_putendl("\n\t    -SECRET MODE-");
+	ft_putendl("\t(Press [6] during intro screen)\n");
 	ft_putendl("\t[R] - Pull In/Out Gun\n\t[Space] - Shoot");
-	ft_putendl("\t[Q] - Reload");
+	ft_putendl("\t[Q] - Reload\n\n");
 }

@@ -6,7 +6,7 @@
 /*   By: mhwangbo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/25 14:54:29 by mhwangbo          #+#    #+#             */
-/*   Updated: 2018/06/09 20:25:14 by jukim            ###   ########.fr       */
+/*   Updated: 2018/06/17 20:29:18 by jukim            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@ void	init_value(t_env *e)
 	e->win_y = 480;
 	e->block_w = 64;
 	e->block_h = 64;
-	e->pos.pos_x = 3;
-	e->pos.pos_y = 3;
+	e->pos.pos_x = 1.5;
+	e->pos.pos_y = 1.5;
 	e->pos.dir_x = -1.0;
 	e->pos.dir_y = 0.0;
 	e->pos.plane_x = 0.0;
@@ -57,16 +57,35 @@ void	init_value(t_env *e)
 	e->caption = 0;
 }
 
+void	error_exit(int i, int fd)
+{
+	if (i == 0)
+	{
+		ft_putendl("usage: ./wolf3d <map_file>");
+		ft_putendl("\t<map_file> size must be at least 3x3");
+	}
+	else if (i == 1)
+	{
+		close(fd);
+		ft_putendl("error: empty or nonexisting <map_file>");
+	}
+	else if (i == 2)
+	{
+		close(fd);
+		ft_putendl("error: invalid file format");
+	}
+	else if (i == 3)
+		ft_putendl("error: invalid file format");
+	exit(0);
+}
+
 int		main(int ac, char **av)
 {
 	t_env	e;
 	int		**file;
 
 	if (ac != 2)
-	{
-		ft_putendl("usage: ./wolf3d <map_file>");
-		return (0);
-	}
+		error_exit(0, 0);
 	ft_bzero(&e, sizeof(t_env));
 	wolf_find_max(av[1], &e);
 	file = wolf_read(av[1], &e);

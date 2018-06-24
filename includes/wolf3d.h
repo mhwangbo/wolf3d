@@ -6,7 +6,7 @@
 /*   By: mhwangbo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/25 14:57:35 by mhwangbo          #+#    #+#             */
-/*   Updated: 2018/06/09 21:06:06 by jukim            ###   ########.fr       */
+/*   Updated: 2018/06/11 21:48:09 by jukim            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <stddef.h>
 # define POS e->pos
 # define ROT 0.1
+# define BUF 999999
 
 typedef struct		s_tex
 {
@@ -34,8 +35,8 @@ typedef struct		s_tex
 
 typedef struct		s_vec
 {
-	double			x;
-	double			y;
+	int				x;
+	int				y;
 	int				wall_type;
 	int				color;
 }					t_vec;
@@ -112,8 +113,9 @@ typedef struct		s_env
 	int				size_line;
 	int				endian;
 	int				*data;
-	double			y_max;
-	double			x_max;
+	int				y_max;
+	int				x_max;
+	int				x_max2;
 	t_vec			**map;
 	t_pos			pos;
 	int				min;
@@ -133,6 +135,7 @@ typedef struct		s_env
 ** util.c
 */
 
+void				file_check(char *av);
 int					animate(t_env *e);
 int					wolf_exit(t_env *e);
 void				billy_off(t_env *e);
@@ -175,6 +178,7 @@ void				position2(t_env *e);
 void				intro_image(t_env *e);
 void				wolf_win(t_env *e);
 void				init_value(t_env *e);
+void				error_exit(int i, int fd);
 int					main(int ac, char **av);
 
 /*
