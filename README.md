@@ -10,19 +10,19 @@ Inspired by the famous eponymous 90s game that was the first First Person Shoote
 	<map_file> size must be at least 3x3
   
 ### Basic Control
-  KEYS:
-	[W,S]/[Arrow Key - Up,Down] - Move Forward/Backward
-	[A,D]/[Arrow Key - Left,Right] - Rotate Left/Right
-	[SHIFT] - Run/Walk
-	[ESC] - Exit
-	[SPACE] - Open Hidden Door
+  - KEYS:  
+	[W,S]/[Arrow Key - Up,Down] - Move Forward/Backward  
+	[A,D]/[Arrow Key - Left,Right] - Rotate Left/Right  
+	[SHIFT] - Run/Walk  
+	[ESC] - Exit  
+	[SPACE] - Open Hidden Door  
 
-	    -SECRET MODE-
-	(Press [6] during intro screen)
-
-	[R] - Pull In/Out Gun
-	[Space] - Shoot
-	[Q] - Reload
+		- SECRET MODE:  
+		(Press [6] during intro screen)  
+  
+		[R] - Pull In/Out Gun  
+		[Space] - Shoot  
+		[Q] - Reload  
  
  
 ## Goals
